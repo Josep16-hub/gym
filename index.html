@@ -37,7 +37,6 @@
 
     .card h2 { font-size: 1.2rem; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 6px; }
 
-    /* Formulario Rutina Pro */
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 6px; }
     input, select {
@@ -84,7 +83,6 @@
       cursor: pointer;
     }
 
-    /* Lista de Ejercicios */
     .routine-item {
       display: flex;
       justify-content: space-between;
@@ -99,7 +97,6 @@
     .btn-edit { background: var(--accent-blue); color: #000; }
     .btn-delete { background: var(--accent-red); }
 
-    /* PLANNING */
     .day-header-container {
       margin: 20px 0 10px 4px;
       border-left: 3px solid var(--accent-blue);
@@ -303,7 +300,6 @@
       gap: 8px;
     }
 
-    /* HISTORIAL PROGRESO Y LEYENDA */
     .progress-card {
       background: #0d1322;
       border: 1px solid #1e293b;
@@ -344,7 +340,6 @@
       margin-bottom: 16px;
     }
 
-    /* CALENDARIO CON NAVEGACIÓN */
     .calendar-header-nav {
       display: flex;
       justify-content: space-between;
@@ -376,11 +371,6 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-    }
-
-    .btn-nav-cal:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
     }
 
     .legend-box {
@@ -425,6 +415,12 @@
       font-size: 0.8rem;
       font-weight: bold;
       color: var(--text-dim);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .activity-day-cell:active {
+      transform: scale(0.92);
     }
 
     .activity-day-cell.entrenado { background: rgba(34, 197, 94, 0.2); border-color: var(--accent-green); color: var(--accent-green); }
@@ -432,7 +428,6 @@
     .activity-day-cell.enfermo { background: rgba(239, 68, 68, 0.2); border-color: var(--accent-red); color: var(--accent-red); }
     .activity-day-cell.today { border: 2px solid #fff; }
 
-    /* CATALOGO EJERCICIOS */
     .ex-guide-card {
       background: #0d1322;
       border: 1px solid var(--card-border);
@@ -459,7 +454,6 @@
       gap: 4px;
     }
 
-    /* CREATINA Y NAVEGACIÓN */
     .btn-take-creatina {
       width: 100%; padding: 16px; font-size: 1.1rem; font-weight: bold;
       border-radius: 10px; border: none; background: var(--accent-green); color: #000; cursor: pointer;
@@ -473,10 +467,36 @@
     .year-day.today { border: 1px solid #fff; }
     .year-day.empty { background: transparent; }
 
+    /* MODAL POPUP DIA */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .modal-box h3 { font-size: 1.1rem; color: var(--accent-blue); margin-bottom: 12px; }
+    .modal-box select { margin-bottom: 16px; font-size: 1rem; }
+    .modal-actions { display: flex; gap: 10px; }
+    .btn-modal {
+      flex: 1; padding: 10px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;
+    }
+    .btn-modal-save { background: var(--accent-blue); color: #000; }
+    .btn-modal-cancel { background: #334155; color: #fff; }
+
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
       background: var(--nav-bg); border-top: 1px solid var(--card-border);
-      display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+      display: flex; justify-around: align-items: center; z-index: 1000;
     }
     .nav-item {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -502,16 +522,22 @@
       <input type="hidden" id="edit-index" value="-1">
       
       <div class="form-group">
-        <label for="dia">Día de la semana</label>
-        <select id="dia">
-          <option>Lunes</option>
-          <option>Martes</option>
-          <option>Miércoles</option>
-          <option>Jueves</option>
-          <option>Viernes</option>
-          <option>Sábado</option>
-          <option>Domingo</option>
+        <label for="dia">Día de la semana o tipo de sesión</label>
+        <select id="dia" onchange="alCambiarDiaSelect(this.value)">
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+          <option value="Sábado">Sábado</option>
+          <option value="Domingo">Domingo</option>
+          <option value="CUSTOM_DIA">✏️ Día Personalizado...</option>
         </select>
+      </div>
+
+      <div class="form-group" id="group-dia-custom" style="display: none;">
+        <label for="dia-custom">Nombre del día personalizado</label>
+        <input type="text" id="dia-custom" placeholder="Ej. Torso, Empuje, Día A...">
       </div>
 
       <div class="form-group">
@@ -574,12 +600,12 @@
     </section>
   </div>
 
-  <!-- PESTAÑA 4: CALENDARIO DE ACTIVIDAD NAVEGABLE -->
+  <!-- PESTAÑA 4: CALENDARIO -->
   <div id="tab-actividad" class="tab-content">
     <section class="card">
       <div class="calendar-header-nav">
         <button class="btn-nav-cal" id="btn-prev-month" onclick="cambiarMesCal(-1)">‹</button>
-        <div class="calendar-title" id="cal-month-year-title">Enero 2026</div>
+        <div class="calendar-title" id="cal-month-year-title">Septiembre 2026</div>
         <button class="btn-nav-cal" id="btn-next-month" onclick="cambiarMesCal(1)">›</button>
       </div>
 
@@ -589,11 +615,15 @@
         <div class="legend-item"><span class="dot dot-enfermo"></span> Enfermo</div>
       </div>
 
+      <p style="font-size: 0.75rem; color: var(--text-dim); text-align: center; margin-bottom: 12px;">
+        👉 Pulsa sobre cualquier día para cambiar su estado.
+      </p>
+
       <div id="actividad-container"></div>
     </section>
   </div>
 
-  <!-- PESTAÑA 5: CREATINA (Píldora) -->
+  <!-- PESTAÑA 5: CREATINA -->
   <div id="tab-creatina" class="tab-content">
     <section class="card" style="text-align: center;">
       <button class="btn-take-creatina" id="btn-main-creatina" onclick="tomarCreatinaAnual()">
@@ -602,7 +632,14 @@
     </section>
 
     <section class="card">
-      <h2 id="year-title">Seguimiento Anual</h2>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="select-creatina-ano">Seleccionar Año de Seguimiento</label>
+        <select id="select-creatina-ano" onchange="generarCalendarioAnual(this.value)">
+          <!-- Los años se generan dinámicamente desde JS -->
+        </select>
+      </div>
+
+      <h2>Seguimiento Anual</h2>
       <div class="year-grid" id="year-container"></div>
     </section>
   </div>
@@ -613,6 +650,23 @@
       <h2>Catálogo de Ejercicios</h2>
       <div id="catalogo-container"></div>
     </section>
+  </div>
+
+  <!-- MODAL SELECCION ESTADO CALENDARIO -->
+  <div class="modal-overlay" id="modal-cal-overlay">
+    <div class="modal-box">
+      <h3 id="modal-cal-title">Cambiar Día</h3>
+      <label for="select-modal-estado">Estado del día:</label>
+      <select id="select-modal-estado">
+        <option value="entrenado">🟢 He entrenado</option>
+        <option value="descanso">🟡 Descanso</option>
+        <option value="enfermo">🔴 Enfermo</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" onclick="cerrarModalCal()">Cancelar</button>
+        <button class="btn-modal btn-modal-save" onclick="guardarModalCal()">Guardar</button>
+      </div>
+    </div>
   </div>
 
   <!-- NAVEGACIÓN INFERIOR -->
@@ -662,12 +716,12 @@
     let estadoDias = JSON.parse(localStorage.getItem('estado_dias_gym')) || {}; 
     let registroDiarioActividad = JSON.parse(localStorage.getItem('registro_actividad_diario')) || {};
 
-    // Variables de navegación del calendario (Mínimo 2026)
     const fechaActual = new Date();
-    let calAño = Math.max(2026, fechaActual.getFullYear());
-    let calMes = (fechaActual.getFullYear() < 2026) ? 0 : fechaActual.getMonth();
+    let calAño = fechaActual.getFullYear();
+    let calMes = fechaActual.getMonth();
+    let fechaISOSeleccionadaModal = null;
 
-    const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    const DIAS_SEMANA_DEFAULT = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     const NOMBRES_MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
     window.onload = function() {
@@ -675,10 +729,32 @@
       renderizarPlanning();
       renderizarProgreso();
       renderizarCatalogo();
+      poblarSelectorAnosCreatina();
       generarCalendarioAnual();
       comprobarBotonCreatina();
       renderizarCalendarioActividad();
     };
+
+    function poblarSelectorAnosCreatina() {
+      const selectAno = document.getElementById('select-creatina-ano');
+      if (!selectAno) return;
+
+      selectAno.innerHTML = '';
+      const anoInicio = 2026;
+      const anoFin = 2050;
+
+      for (let y = anoInicio; y <= anoFin; y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.innerText = y;
+        if (y === anoInicio) opt.selected = true;
+        selectAno.appendChild(opt);
+      }
+    }
+
+    function alCambiarDiaSelect(val) {
+      document.getElementById('group-dia-custom').style.display = (val === 'CUSTOM_DIA') ? 'block' : 'none';
+    }
 
     function alCambiarZonas() {
       const checkboxes = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
@@ -726,21 +802,29 @@
       if (tab === 'planning') renderizarPlanning();
       if (tab === 'progreso') renderizarProgreso();
       if (tab === 'actividad') renderizarCalendarioActividad();
+      if (tab === 'creatina') generarCalendarioAnual();
       if (tab === 'ejercicios') renderizarCatalogo();
     }
 
     function guardarEjercicio() {
-      const dia = document.getElementById('dia').value;
+      let diaSelect = document.getElementById('dia').value;
+      let dia = diaSelect;
+      
+      if (diaSelect === 'CUSTOM_DIA') {
+        dia = document.getElementById('dia-custom').value.trim();
+      }
+
       const checkboxes = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
       const zonas = Array.from(checkboxes).map(cb => cb.value);
       
       let ejercicio = document.getElementById('select-ejercicio').value;
-      if (ejercicio === 'CUSTOM') ejercicio = document.getElementById('ejercicio-custom').value;
+      if (ejercicio === 'CUSTOM') ejercicio = document.getElementById('ejercicio-custom').value.trim();
 
       const series = document.getElementById('series').value;
       const reps = document.getElementById('reps').value;
       const editIndex = parseInt(document.getElementById('edit-index').value);
 
+      if (!dia) return alert('Por favor introduce un día o nombre de sesión.');
       if (zonas.length === 0) return alert('Por favor selecciona al menos una zona muscular.');
       if (!ejercicio) return alert('Por favor selecciona o escribe un ejercicio.');
       if (!series || !reps) return alert('Rellena las series y reps objetivo.');
@@ -789,7 +873,17 @@
 
     function editarEjercicio(index) {
       const item = rutinas[index];
-      document.getElementById('dia').value = item.dia;
+      const selectDia = document.getElementById('dia');
+
+      if (DIAS_SEMANA_DEFAULT.includes(item.dia)) {
+        selectDia.value = item.dia;
+        document.getElementById('group-dia-custom').style.display = 'none';
+      } else {
+        selectDia.value = 'CUSTOM_DIA';
+        document.getElementById('group-dia-custom').style.display = 'block';
+        document.getElementById('dia-custom').value = item.dia;
+      }
+
       document.querySelectorAll('.muscle-grid input[type="checkbox"]').forEach(cb => {
         cb.checked = item.zonas && item.zonas.includes(cb.value);
       });
@@ -822,6 +916,9 @@
     }
 
     function limpiarFormulario() {
+      document.getElementById('dia').value = 'Lunes';
+      document.getElementById('group-dia-custom').style.display = 'none';
+      document.getElementById('dia-custom').value = '';
       document.querySelectorAll('.muscle-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
       alCambiarZonas();
       document.getElementById('select-ejercicio').value = '';
@@ -835,8 +932,12 @@
       localStorage.setItem('estado_dias_gym', JSON.stringify(estadoDias));
 
       const hoyISO = obtenerFechaHoyISO();
-      if (estado === 'descanso' || estado === 'enfermo') {
-        registroDiarioActividad[hoyISO] = estado;
+
+      if (estado === 'descanso') {
+        registroDiarioActividad[hoyISO] = 'descanso';
+        localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
+      } else if (estado === 'enfermo') {
+        registroDiarioActividad[hoyISO] = 'enfermo';
         localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
       }
 
@@ -852,7 +953,9 @@
         return;
       }
 
-      DIAS_SEMANA.forEach(dia => {
+      const diasEnRutina = [...new Set(rutinas.map(item => item.dia))];
+
+      diasEnRutina.forEach(dia => {
         const ejerciciosDelDia = rutinas.filter(item => item.dia === dia);
 
         if (ejerciciosDelDia.length > 0) {
@@ -939,7 +1042,7 @@
 
             const finishBtn = document.createElement('button');
             finishBtn.className = 'btn-finish-day';
-            finishBtn.innerHTML = `🏋️‍♂️ ¡Ya he terminado (${dia})! 💪`;
+            finishBtn.innerHTML = `🏋️‍♂️ ¡Ya he terminado! 💪`;
             finishBtn.onclick = () => finalizarDia(dia, ejerciciosDelDia);
             container.appendChild(finishBtn);
           }
@@ -989,7 +1092,7 @@
       localStorage.setItem('historial_progreso', JSON.stringify(historialProgreso));
       localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
 
-      alert(`💪 ¡Entrenamiento del ${dia} finalizado con éxito!`);
+      alert(`💪 ¡Entrenamiento finalizado con éxito! Registrado en tu Calendario.`);
       renderizarPlanning();
       renderizarProgreso();
     }
@@ -1034,7 +1137,6 @@
       }
     }
 
-    /* CALENDARIO DE ACTIVIDAD CON NAVEGACIÓN Y LÍMITE EN 2026 */
     function cambiarMesCal(delta) {
       calMes += delta;
       if (calMes > 11) {
@@ -1045,25 +1147,40 @@
         calAño--;
       }
 
-      // Prevenir retroceder antes de Enero de 2026
-      if (calAño < 2026) {
-        calAño = 2026;
-        calMes = 0;
-      }
+      renderizarCalendarioActividad();
+    }
 
+    function abrirModalCal(fechaISO, diaNum) {
+      fechaISOSeleccionadaModal = fechaISO;
+      const estadoActual = registroDiarioActividad[fechaISO] || 'descanso';
+      
+      document.getElementById('modal-cal-title').innerText = `Día ${diaNum} (${fechaISO})`;
+      document.getElementById('select-modal-estado').value = estadoActual;
+      document.getElementById('modal-cal-overlay').classList.add('active');
+    }
+
+    function cerrarModalCal() {
+      document.getElementById('modal-cal-overlay').classList.remove('active');
+      fechaISOSeleccionadaModal = null;
+    }
+
+    function guardarModalCal() {
+      if (!fechaISOSeleccionadaModal) return;
+      const nuevoEstado = document.getElementById('select-modal-estado').value;
+
+      registroDiarioActividad[fechaISOSeleccionadaModal] = nuevoEstado;
+
+      localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
+      cerrarModalCal();
       renderizarCalendarioActividad();
     }
 
     function renderizarCalendarioActividad() {
       const container = document.getElementById('actividad-container');
       const title = document.getElementById('cal-month-year-title');
-      const btnPrev = document.getElementById('btn-prev-month');
 
       container.innerHTML = '';
       title.innerText = `${NOMBRES_MESES[calMes]} ${calAño}`;
-
-      // Deshabilitar botón de retroceder si ya estamos en Enero 2026
-      btnPrev.disabled = (calAño === 2026 && calMes === 0);
 
       const primerDia = new Date(calAño, calMes, 1).getDay();
       const totalDias = new Date(calAño, calMes + 1, 0).getDate();
@@ -1088,19 +1205,27 @@
         grid.appendChild(empty);
       }
 
+      const hoyISO = obtenerFechaHoyISO();
+
       for (let dia = 1; dia <= totalDias; dia++) {
         const cell = document.createElement('div');
         cell.className = 'activity-day-cell';
         cell.innerText = dia;
 
         const fechaISO = `${calAño}-${String(calMes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-        const estado = registroDiarioActividad[fechaISO];
+        let estado = registroDiarioActividad[fechaISO];
+
+        if (!estado && fechaISO <= hoyISO) {
+          estado = 'descanso';
+        }
 
         if (estado === 'entrenado') cell.classList.add('entrenado');
         else if (estado === 'descanso') cell.classList.add('descanso');
         else if (estado === 'enfermo') cell.classList.add('enfermo');
 
-        if (fechaISO === obtenerFechaHoyISO()) cell.classList.add('today');
+        if (fechaISO === hoyISO) cell.classList.add('today');
+
+        cell.onclick = () => abrirModalCal(fechaISO, dia);
 
         grid.appendChild(cell);
       }
@@ -1161,24 +1286,29 @@
       }
     }
 
-    function generarCalendarioAnual() {
+    function generarCalendarioAnual(anoSeleccionado) {
       const container = document.getElementById('year-container');
+      const selectAno = document.getElementById('select-creatina-ano');
+      
       container.innerHTML = '';
-      const currentYear = new Date().getFullYear();
-      document.getElementById('year-title').innerText = `Seguimiento ${currentYear}`;
 
-      for (let mes = 0; mes < 12; mes++) {
+      let ano = anoSeleccionado ? parseInt(anoSeleccionado) : (selectAno ? parseInt(selectAno.value) : 2026);
+
+      // Si es 2026 empieza en septiembre (mes index 8), para los demás años empieza en enero (mes index 0)
+      const mesInicio = (ano === 2026) ? 8 : 0;
+
+      for (let mes = mesInicio; mes < 12; mes++) {
         const monthBox = document.createElement('div');
         const title = document.createElement('div');
         title.className = 'month-title';
-        title.innerText = NOMBRES_MESES[mes];
+        title.innerText = `${NOMBRES_MESES[mes]} ${ano}`;
         monthBox.appendChild(title);
 
         const daysGrid = document.createElement('div');
         daysGrid.className = 'month-days';
 
-        const primerDia = new Date(currentYear, mes, 1).getDay();
-        const totalDias = new Date(currentYear, mes + 1, 0).getDate();
+        const primerDia = new Date(ano, mes, 1).getDay();
+        const totalDias = new Date(ano, mes + 1, 0).getDate();
         let offset = primerDia === 0 ? 6 : primerDia - 1;
 
         for (let i = 0; i < offset; i++) {
@@ -1191,7 +1321,7 @@
           const dayEl = document.createElement('div');
           dayEl.className = 'year-day';
           dayEl.innerText = dia;
-          const fechaISO = `${currentYear}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+          const fechaISO = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
 
           if (creatinaDias.includes(fechaISO)) dayEl.classList.add('taken');
           if (fechaISO === obtenerFechaHoyISO()) dayEl.classList.add('today');
