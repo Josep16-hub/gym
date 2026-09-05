@@ -71,6 +71,25 @@
       accent-color: var(--accent-blue);
     }
 
+    /* Estilo para los botones de lista de ejercicios */
+    .exercise-checkbox-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .exercise-checkbox-btn input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--accent-blue);
+    }
+
     .btn-submit {
       width: 100%;
       background: var(--accent-blue);
@@ -531,7 +550,7 @@
   <!-- PESTAÑA 1: RUTINA PRO -->
   <div id="tab-rutina" class="tab-content active">
     <section class="card">
-      <h2 id="form-title">Añadir Ejercicio</h2>
+      <h2 id="form-title">Añadir Ejercicio(s)</h2>
       <input type="hidden" id="edit-index" value="-1">
       
       <div class="form-group">
@@ -567,11 +586,12 @@
         </div>
       </div>
 
+      <!-- SECCIÓN DE SELECCIÓN MÚLTIPLE DE EJERCICIOS -->
       <div class="form-group">
-        <label for="select-ejercicio">Selecciona el Ejercicio</label>
-        <select id="select-ejercicio" onchange="alSeleccionarEjercicio(this.value)">
-          <option value="">-- Selecciona una zona primero --</option>
-        </select>
+        <label>Selecciona los Ejercicios (puedes marcar varios)</label>
+        <div id="ejercicios-grid" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="color: var(--text-dim); font-size: 0.85rem;">-- Selecciona una zona muscular primero --</p>
+        </div>
       </div>
 
       <div class="form-group" id="group-ejercicio-manual" style="display: none;">
@@ -582,15 +602,15 @@
       <div class="form-group" style="display: flex; gap: 10px;">
         <div style="flex: 1;">
           <label for="series">Series</label>
-          <input type="number" id="series" placeholder="4">
+          <input type="number" id="series" value="4" placeholder="4">
         </div>
         <div style="flex: 1;">
           <label for="reps">Reps Objetivo</label>
-          <input type="text" id="reps" placeholder="8-10">
+          <input type="text" id="reps" value="8-10" placeholder="8-10">
         </div>
       </div>
 
-      <button class="btn-submit" id="btn-save" onclick="guardarEjercicio()">Guardar Ejercicio</button>
+      <button class="btn-submit" id="btn-save" onclick="guardarEjercicio()">Guardar Ejercicio(s)</button>
     </section>
 
     <section class="card">
@@ -648,7 +668,6 @@
       <div class="form-group" style="margin-bottom: 16px;">
         <label for="select-creatina-ano">Seleccionar Año de Seguimiento</label>
         <select id="select-creatina-ano" onchange="generarCalendarioAnual(this.value)">
-          <!-- Los años se generan dinámicamente desde JS -->
         </select>
       </div>
 
@@ -772,14 +791,15 @@
       document.getElementById('group-dia-custom').style.display = (val === 'CUSTOM_DIA') ? 'block' : 'none';
     }
 
+    /* NUEVA LÓGICA DE SELECCIÓN MÚLTIPLE DE EJERCICIOS */
     function alCambiarZonas() {
       const checkboxes = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
       const zonasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
-      const select = document.getElementById('select-ejercicio');
+      const grid = document.getElementById('ejercicios-grid');
 
-      select.innerHTML = '';
+      grid.innerHTML = '';
       if (zonasSeleccionadas.length === 0) {
-        select.innerHTML = '<option value="">-- Selecciona una zona primero --</option>';
+        grid.innerHTML = '<p style="color: var(--text-dim); font-size: 0.85rem;">-- Selecciona una zona primero --</p>';
         document.getElementById('group-ejercicio-manual').style.display = 'none';
         return;
       }
@@ -790,22 +810,29 @@
       });
 
       ejerciciosFiltrados = [...new Set(ejerciciosFiltrados)];
-      select.innerHTML = '<option value="">-- Selecciona un ejercicio --</option>';
-      ejerciciosFiltrados.forEach(ex => {
-        const opt = document.createElement('option');
-        opt.value = ex;
-        opt.innerText = ex;
-        select.appendChild(opt);
+      
+      ejerciciosFiltrados.forEach((ex, idx) => {
+        const label = document.createElement('label');
+        label.className = 'exercise-checkbox-btn';
+        label.innerHTML = `
+          <input type="checkbox" name="ejercicios_seleccionados" value="${ex}">
+          ${ex}
+        `;
+        grid.appendChild(label);
       });
 
-      const optCustom = document.createElement('option');
-      optCustom.value = "CUSTOM";
-      optCustom.innerText = "➕ Otro (Escribir manualmente)";
-      select.appendChild(optCustom);
+      // Opción personalizada al final
+      const labelCustom = document.createElement('label');
+      labelCustom.className = 'exercise-checkbox-btn';
+      labelCustom.innerHTML = `
+        <input type="checkbox" id="chk-custom" onchange="toggleEjercicioCustomManual(this.checked)">
+        ➕ Otro (Escribir manualmente)
+      `;
+      grid.appendChild(labelCustom);
     }
 
-    function alSeleccionarEjercicio(val) {
-      document.getElementById('group-ejercicio-manual').style.display = (val === 'CUSTOM') ? 'block' : 'none';
+    function toggleEjercicioCustomManual(checked) {
+      document.getElementById('group-ejercicio-manual').style.display = checked ? 'block' : 'none';
     }
 
     function cambiarTab(tab) {
@@ -822,6 +849,7 @@
       if (tab === 'ejercicios') renderizarCatalogo();
     }
 
+    /* GUARDA VARIOS EJERCICIOS A LA VEZ */
     function guardarEjercicio() {
       let diaSelect = document.getElementById('dia').value;
       let dia = diaSelect;
@@ -830,11 +858,18 @@
         dia = document.getElementById('dia-custom').value.trim();
       }
 
-      const checkboxes = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
-      const zonas = Array.from(checkboxes).map(cb => cb.value);
-      
-      let ejercicio = document.getElementById('select-ejercicio').value;
-      if (ejercicio === 'CUSTOM') ejercicio = document.getElementById('ejercicio-custom').value.trim();
+      const checkboxesZonas = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
+      const zonas = Array.from(checkboxesZonas).map(cb => cb.value);
+
+      // Obtener todos los ejercicios marcados
+      const chksEjercicios = document.querySelectorAll('input[name="ejercicios_seleccionados"]:checked');
+      let ejerciciosSeleccionados = Array.from(chksEjercicios).map(cb => cb.value);
+
+      const chkCustom = document.getElementById('chk-custom');
+      if (chkCustom && chkCustom.checked) {
+        const manualName = document.getElementById('ejercicio-custom').value.trim();
+        if (manualName) ejerciciosSeleccionados.push(manualName);
+      }
 
       const series = document.getElementById('series').value;
       const reps = document.getElementById('reps').value;
@@ -842,18 +877,20 @@
 
       if (!dia) return alert('Por favor introduce un día o nombre de sesión.');
       if (zonas.length === 0) return alert('Por favor selecciona al menos una zona muscular.');
-      if (!ejercicio) return alert('Por favor selecciona o escribe un ejercicio.');
+      if (ejerciciosSeleccionados.length === 0) return alert('Por favor selecciona al menos un ejercicio.');
       if (!series || !reps) return alert('Rellena las series y reps objetivo.');
 
-      const nuevo = { dia, zonas, ejercicio, series, reps };
-
       if (editIndex === -1) {
-        rutinas.push(nuevo);
+        // Añade cada ejercicio seleccionado
+        ejerciciosSeleccionados.forEach(ej => {
+          rutinas.push({ dia, zonas, ejercicio: ej, series, reps });
+        });
       } else {
-        rutinas[editIndex] = nuevo;
+        // Modo edición de uno individual
+        rutinas[editIndex] = { dia, zonas, ejercicio: ejerciciosSeleccionados[0], series, reps };
         document.getElementById('edit-index').value = "-1";
-        document.getElementById('form-title').innerText = "Añadir Ejercicio";
-        document.getElementById('btn-save').innerText = "Guardar Ejercicio";
+        document.getElementById('form-title').innerText = "Añadir Ejercicio(s)";
+        document.getElementById('btn-save').innerText = "Guardar Ejercicio(s)";
       }
 
       localStorage.setItem('rutinas_gym', JSON.stringify(rutinas));
@@ -903,15 +940,20 @@
       document.querySelectorAll('.muscle-grid input[type="checkbox"]').forEach(cb => {
         cb.checked = item.zonas && item.zonas.includes(cb.value);
       });
+      
       alCambiarZonas();
 
-      const select = document.getElementById('select-ejercicio');
-      if (Array.from(select.options).some(o => o.value === item.ejercicio)) {
-        select.value = item.ejercicio;
+      // Dejar marcado el ejercicio a editar
+      const targetChk = document.querySelector(`input[name="ejercicios_seleccionados"][value="${item.ejercicio}"]`);
+      if (targetChk) {
+        targetChk.checked = true;
       } else {
-        select.value = 'CUSTOM';
-        document.getElementById('group-ejercicio-manual').style.display = 'block';
-        document.getElementById('ejercicio-custom').value = item.ejercicio;
+        const chkCustom = document.getElementById('chk-custom');
+        if (chkCustom) {
+          chkCustom.checked = true;
+          toggleEjercicioCustomManual(true);
+          document.getElementById('ejercicio-custom').value = item.ejercicio;
+        }
       }
 
       document.getElementById('series').value = item.series;
@@ -937,10 +979,9 @@
       document.getElementById('dia-custom').value = '';
       document.querySelectorAll('.muscle-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
       alCambiarZonas();
-      document.getElementById('select-ejercicio').value = '';
       document.getElementById('ejercicio-custom').value = '';
-      document.getElementById('series').value = '';
-      document.getElementById('reps').value = '';
+      document.getElementById('series').value = '4';
+      document.getElementById('reps').value = '8-10';
     }
 
     function cambiarEstadoDia(dia, estado) {
@@ -1285,7 +1326,6 @@
       if (!creatinaDias.includes(hoyISO)) {
         creatinaDias.push(hoyISO);
       } else {
-        // Si se pulsa y ya estaba marcada, la desmarca
         creatinaDias = creatinaDias.filter(d => d !== hoyISO);
       }
       localStorage.setItem('creatina_dias', JSON.stringify(creatinaDias));
@@ -1330,7 +1370,6 @@
 
       let ano = anoSeleccionado ? parseInt(anoSeleccionado) : (selectAno ? parseInt(selectAno.value) : 2026);
 
-      // 2026 empieza en septiembre (mes 8), los demás años desde enero (mes 0)
       const mesInicio = (ano === 2026) ? 8 : 0;
 
       for (let mes = mesInicio; mes < 12; mes++) {
@@ -1362,7 +1401,6 @@
           if (creatinaDias.includes(fechaISO)) dayEl.classList.add('taken');
           if (fechaISO === obtenerFechaHoyISO()) dayEl.classList.add('today');
 
-          // Permite marcar/desmarcar con un toque directo
           dayEl.onclick = () => toggleDiaCreatinaManual(fechaISO);
 
           daysGrid.appendChild(dayEl);
