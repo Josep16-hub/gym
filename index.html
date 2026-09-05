@@ -71,7 +71,6 @@
       accent-color: var(--accent-blue);
     }
 
-    /* Estilo para los botones de lista de ejercicios */
     .exercise-checkbox-btn {
       display: flex;
       align-items: center;
@@ -117,7 +116,7 @@
     .btn-delete { background: var(--accent-red); }
 
     .day-header-container {
-      margin: 20px 0 10px 4px;
+      margin: 20px 0 14px 4px;
       border-left: 3px solid var(--accent-blue);
       padding-left: 8px;
     }
@@ -128,45 +127,6 @@
       color: var(--accent-blue);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-
-    .day-status-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .btn-status-option {
-      flex: 1;
-      padding: 8px 4px;
-      border-radius: 6px;
-      border: 1px solid var(--card-border);
-      background: var(--input-bg);
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .btn-status-option.active {
-      background: #1e293b;
-      color: #fff;
-      border-color: var(--accent-blue);
-    }
-
-    .status-notice {
-      padding: 16px;
-      background: #0d1322;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      text-align: center;
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      margin-bottom: 20px;
     }
 
     .exercise-card {
@@ -406,6 +366,7 @@
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
     .dot-entrenado { background: var(--accent-green); }
+    .dot-custom { background: var(--accent-purple); }
     .dot-descanso { background: var(--accent-yellow); }
     .dot-enfermo { background: var(--accent-red); }
 
@@ -443,6 +404,7 @@
     }
 
     .activity-day-cell.entrenado { background: rgba(34, 197, 94, 0.2); border-color: var(--accent-green); color: var(--accent-green); }
+    .activity-day-cell.custom { background: rgba(168, 85, 247, 0.2); border-color: var(--accent-purple); color: var(--accent-purple); }
     .activity-day-cell.descanso { background: rgba(234, 179, 8, 0.2); border-color: var(--accent-yellow); color: var(--accent-yellow); }
     .activity-day-cell.enfermo { background: rgba(239, 68, 68, 0.2); border-color: var(--accent-red); color: var(--accent-red); }
     .activity-day-cell.today { border: 2px solid #fff; }
@@ -586,7 +548,6 @@
         </div>
       </div>
 
-      <!-- SECCIÓN DE SELECCIÓN MÚLTIPLE DE EJERCICIOS -->
       <div class="form-group">
         <label>Selecciona los Ejercicios (puedes marcar varios)</label>
         <div id="ejercicios-grid" style="display: flex; flex-direction: column; gap: 8px;">
@@ -644,6 +605,7 @@
 
       <div class="legend-box">
         <div class="legend-item"><span class="dot dot-entrenado"></span> Entrenado</div>
+        <div class="legend-item"><span class="dot dot-custom"></span> Personalizado</div>
         <div class="legend-item"><span class="dot dot-descanso"></span> Descanso</div>
         <div class="legend-item"><span class="dot dot-enfermo"></span> Enfermo</div>
       </div>
@@ -693,7 +655,8 @@
       <h3 id="modal-cal-title">Cambiar Día</h3>
       <label for="select-modal-estado">Estado del día:</label>
       <select id="select-modal-estado">
-        <option value="entrenado">🟢 He entrenado</option>
+        <option value="entrenado">🟢 He entrenado (Normal)</option>
+        <option value="custom">🟣 Día Personalizado</option>
         <option value="descanso">🟡 Descanso</option>
         <option value="enfermo">🔴 Enfermo</option>
       </select>
@@ -748,7 +711,6 @@
     let seriesData = JSON.parse(localStorage.getItem('series_gym_data')) || {}; 
     let historialProgreso = JSON.parse(localStorage.getItem('historial_progreso')) || {}; 
     let creatinaDias = JSON.parse(localStorage.getItem('creatina_dias')) || [];
-    let estadoDias = JSON.parse(localStorage.getItem('estado_dias_gym')) || {}; 
     let registroDiarioActividad = JSON.parse(localStorage.getItem('registro_actividad_diario')) || {};
 
     const fechaActual = new Date();
@@ -791,7 +753,6 @@
       document.getElementById('group-dia-custom').style.display = (val === 'CUSTOM_DIA') ? 'block' : 'none';
     }
 
-    /* NUEVA LÓGICA DE SELECCIÓN MÚLTIPLE DE EJERCICIOS */
     function alCambiarZonas() {
       const checkboxes = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
       const zonasSeleccionadas = Array.from(checkboxes).map(cb => cb.value);
@@ -811,7 +772,7 @@
 
       ejerciciosFiltrados = [...new Set(ejerciciosFiltrados)];
       
-      ejerciciosFiltrados.forEach((ex, idx) => {
+      ejerciciosFiltrados.forEach((ex) => {
         const label = document.createElement('label');
         label.className = 'exercise-checkbox-btn';
         label.innerHTML = `
@@ -821,7 +782,6 @@
         grid.appendChild(label);
       });
 
-      // Opción personalizada al final
       const labelCustom = document.createElement('label');
       labelCustom.className = 'exercise-checkbox-btn';
       labelCustom.innerHTML = `
@@ -849,7 +809,6 @@
       if (tab === 'ejercicios') renderizarCatalogo();
     }
 
-    /* GUARDA VARIOS EJERCICIOS A LA VEZ */
     function guardarEjercicio() {
       let diaSelect = document.getElementById('dia').value;
       let dia = diaSelect;
@@ -861,7 +820,6 @@
       const checkboxesZonas = document.querySelectorAll('.muscle-grid input[type="checkbox"]:checked');
       const zonas = Array.from(checkboxesZonas).map(cb => cb.value);
 
-      // Obtener todos los ejercicios marcados
       const chksEjercicios = document.querySelectorAll('input[name="ejercicios_seleccionados"]:checked');
       let ejerciciosSeleccionados = Array.from(chksEjercicios).map(cb => cb.value);
 
@@ -881,12 +839,10 @@
       if (!series || !reps) return alert('Rellena las series y reps objetivo.');
 
       if (editIndex === -1) {
-        // Añade cada ejercicio seleccionado
         ejerciciosSeleccionados.forEach(ej => {
           rutinas.push({ dia, zonas, ejercicio: ej, series, reps });
         });
       } else {
-        // Modo edición de uno individual
         rutinas[editIndex] = { dia, zonas, ejercicio: ejerciciosSeleccionados[0], series, reps };
         document.getElementById('edit-index').value = "-1";
         document.getElementById('form-title').innerText = "Añadir Ejercicio(s)";
@@ -943,7 +899,6 @@
       
       alCambiarZonas();
 
-      // Dejar marcado el ejercicio a editar
       const targetChk = document.querySelector(`input[name="ejercicios_seleccionados"][value="${item.ejercicio}"]`);
       if (targetChk) {
         targetChk.checked = true;
@@ -984,23 +939,6 @@
       document.getElementById('reps').value = '8-10';
     }
 
-    function cambiarEstadoDia(dia, estado) {
-      estadoDias[dia] = estado;
-      localStorage.setItem('estado_dias_gym', JSON.stringify(estadoDias));
-
-      const hoyISO = obtenerFechaHoyISO();
-
-      if (estado === 'descanso') {
-        registroDiarioActividad[hoyISO] = 'descanso';
-        localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
-      } else if (estado === 'enfermo') {
-        registroDiarioActividad[hoyISO] = 'enfermo';
-        localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
-      }
-
-      renderizarPlanning();
-    }
-
     function renderizarPlanning() {
       const container = document.getElementById('planning-container');
       container.innerHTML = '';
@@ -1016,93 +954,70 @@
         const ejerciciosDelDia = rutinas.filter(item => item.dia === dia);
 
         if (ejerciciosDelDia.length > 0) {
-          const currentStatus = estadoDias[dia] || 'entrenar';
-
           const dayHeader = document.createElement('div');
           dayHeader.className = 'day-header-container';
           dayHeader.innerHTML = `<div class="day-title">${dia}</div>`;
           container.appendChild(dayHeader);
 
-          const statusSelector = document.createElement('div');
-          statusSelector.className = 'day-status-selector';
-          statusSelector.innerHTML = `
-            <button class="btn-status-option ${currentStatus === 'entrenar' ? 'active' : ''}" onclick="cambiarEstadoDia('${dia}', 'entrenar')">🏋️ Entrenar</button>
-            <button class="btn-status-option ${currentStatus === 'descanso' ? 'active' : ''}" onclick="cambiarEstadoDia('${dia}', 'descanso')">🪫 Descanso</button>
-            <button class="btn-status-option ${currentStatus === 'enfermo' ? 'active' : ''}" onclick="cambiarEstadoDia('${dia}', 'enfermo')">🤒 Enfermo</button>
-          `;
-          container.appendChild(statusSelector);
+          ejerciciosDelDia.forEach((item, exIdx) => {
+            const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
+            const totalSeries = parseInt(item.series) || 1;
 
-          if (currentStatus === 'descanso') {
-            const notice = document.createElement('div');
-            notice.className = 'status-notice';
-            notice.innerHTML = '🪫 <strong>Día de Descanso.</strong> ¡Aprovecha para recuperar fuerzas!';
-            container.appendChild(notice);
-          } else if (currentStatus === 'enfermo') {
-            const notice = document.createElement('div');
-            notice.className = 'status-notice';
-            notice.innerHTML = '🤒 <strong>Estar enfermo es una prioridad de descanso.</strong> ¡Mejórate pronto!';
-            container.appendChild(notice);
-          } else {
-            ejerciciosDelDia.forEach((item, exIdx) => {
-              const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
-              const totalSeries = parseInt(item.series) || 1;
+            if (!seriesData[key]) {
+              seriesData[key] = { previo: null, sets: Array(totalSeries).fill({ weight: '', reps: '', done: false }) };
+            }
 
-              if (!seriesData[key]) {
-                seriesData[key] = { previo: null, sets: Array(totalSeries).fill({ weight: '', reps: '', done: false }) };
-              }
+            let completedCount = seriesData[key].sets.filter(s => s.done).length;
+            const card = document.createElement('div');
+            card.className = 'exercise-card';
 
-              let completedCount = seriesData[key].sets.filter(s => s.done).length;
-              const card = document.createElement('div');
-              card.className = 'exercise-card';
+            let prevText = seriesData[key].previo 
+              ? `Registro previo: ${seriesData[key].previo.weight} kg × ${seriesData[key].previo.reps} (${seriesData[key].previo.fecha})`
+              : 'Sin registro previo';
 
-              let prevText = seriesData[key].previo 
-                ? `Registro previo: ${seriesData[key].previo.weight} kg × ${seriesData[key].previo.reps} (${seriesData[key].previo.fecha})`
-                : 'Sin registro previo';
-
-              let setsHTML = '';
-              for (let i = 0; i < totalSeries; i++) {
-                const setData = seriesData[key].sets[i] || { weight: '', reps: '', done: false };
-                setsHTML += `
-                  <div class="set-row">
-                    <div class="set-num">${i + 1}</div>
-                    <div class="input-box-container">
-                      <input type="number" id="w_${key}_${i}" value="${setData.weight}" placeholder="0" onchange="actualizarSerie('${key}', ${i})">
-                      <span class="unit-label">KG</span>
-                    </div>
-                    <div class="input-box-container">
-                      <input type="number" id="r_${key}_${i}" value="${setData.reps}" placeholder="0" onchange="actualizarSerie('${key}', ${i})">
-                      <span class="unit-label">REPS</span>
-                    </div>
-                    <button class="btn-check-set ${setData.done ? 'done' : ''}" onclick="toggleSerieDone('${key}', ${i})">✓</button>
+            let setsHTML = '';
+            for (let i = 0; i < totalSeries; i++) {
+              const setData = seriesData[key].sets[i] || { weight: '', reps: '', done: false };
+              setsHTML += `
+                <div class="set-row">
+                  <div class="set-num">${i + 1}</div>
+                  <div class="input-box-container">
+                    <input type="number" id="w_${key}_${i}" value="${setData.weight}" placeholder="0" onchange="actualizarSerie('${key}', ${i})">
+                    <span class="unit-label">KG</span>
                   </div>
-                `;
-              }
-
-              const zonasText = item.zonas ? item.zonas.join(', ') : '';
-              card.innerHTML = `
-                <div class="exercise-card-header">
-                  <div class="exercise-number-title">
-                    <div class="ex-num">${exIdx + 1}</div>
-                    <div class="ex-title">${item.ejercicio}</div>
+                  <div class="input-box-container">
+                    <input type="number" id="r_${key}_${i}" value="${setData.reps}" placeholder="0" onchange="actualizarSerie('${key}', ${i})">
+                    <span class="unit-label">REPS</span>
                   </div>
-                  <div class="series-counter" id="counter_${key}">${completedCount}/${totalSeries}</div>
+                  <button class="btn-check-set ${setData.done ? 'done' : ''}" onclick="toggleSerieDone('${key}', ${i})">✓</button>
                 </div>
-                <div>
-                  <span class="target-badge">${item.series} × ${item.reps} reps</span>
-                  ${zonasText ? `<span class="muscle-badge">${zonasText}</span>` : ''}
-                </div>
-                <div class="prev-record">${prevText}</div>
-                <div class="sets-list">${setsHTML}</div>
               `;
-              container.appendChild(card);
-            });
+            }
 
-            const finishBtn = document.createElement('button');
-            finishBtn.className = 'btn-finish-day';
-            finishBtn.innerHTML = `🏋️‍♂️ ¡Ya he terminado! 💪`;
-            finishBtn.onclick = () => finalizarDia(dia, ejerciciosDelDia);
-            container.appendChild(finishBtn);
-          }
+            const zonasText = item.zonas ? item.zonas.join(', ') : '';
+            card.innerHTML = `
+              <div class="exercise-card-header">
+                <div class="exercise-number-title">
+                  <div class="ex-num">${exIdx + 1}</div>
+                  <div class="ex-title">${item.ejercicio}</div>
+                </div>
+                <div class="series-counter" id="counter_${key}">${completedCount}/${totalSeries}</div>
+              </div>
+              <div>
+                <span class="target-badge">${item.series} × ${item.reps} reps</span>
+                ${zonasText ? `<span class="muscle-badge">${zonasText}</span>` : ''}
+              </div>
+              <div class="prev-record">${prevText}</div>
+              <div class="sets-list">${setsHTML}</div>
+            `;
+            container.appendChild(card);
+          });
+
+          const finishBtn = document.createElement('button');
+          finishBtn.className = 'btn-finish-day';
+          finishBtn.innerHTML = `🏋️‍♂️ ¡Ya he terminado! 💪`;
+          finishBtn.onclick = () => finalizarDia(dia, ejerciciosDelDia);
+          container.appendChild(finishBtn);
         }
       });
     }
@@ -1128,6 +1043,7 @@
       const fechaStr = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
       const hoyISO = obtenerFechaHoyISO();
 
+      // 1. Guardar el progreso de las series completadas
       ejercicios.forEach(item => {
         const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
         const sets = seriesData[key]?.sets || [];
@@ -1143,15 +1059,30 @@
         if (seriesData[key]) seriesData[key].sets.forEach(s => s.done = false);
       });
 
-      registroDiarioActividad[hoyISO] = 'entrenado';
+      // 2. Comprobar si el día es de la semana estándar o personalizado
+      const esDiaEstandar = DIAS_SEMANA_DEFAULT.includes(dia);
 
+      if (esDiaEstandar) {
+        registroDiarioActividad[hoyISO] = 'entrenado';
+      } else {
+        // Es un día personalizado: guardar como 'custom' en el calendario
+        registroDiarioActividad[hoyISO] = 'custom';
+        
+        // Eliminar los ejercicios configurados bajo este nombre de día personalizado
+        rutinas = rutinas.filter(item => item.dia !== dia);
+        localStorage.setItem('rutinas_gym', JSON.stringify(rutinas));
+      }
+
+      // 3. Actualizar almacenamiento local
       localStorage.setItem('series_gym_data', JSON.stringify(seriesData));
       localStorage.setItem('historial_progreso', JSON.stringify(historialProgreso));
       localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
 
-      alert(`💪 ¡Entrenamiento finalizado con éxito! Registrado en tu Calendario.`);
+      // 4. Re-renderizar la interfaz
+      renderizarRutinas();
       renderizarPlanning();
       renderizarProgreso();
+      renderizarCalendarioActividad();
     }
 
     function renderizarProgreso() {
@@ -1277,6 +1208,7 @@
         }
 
         if (estado === 'entrenado') cell.classList.add('entrenado');
+        else if (estado === 'custom') cell.classList.add('custom');
         else if (estado === 'descanso') cell.classList.add('descanso');
         else if (estado === 'enfermo') cell.classList.add('enfermo');
 
