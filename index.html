@@ -462,10 +462,23 @@
     .year-grid { display: flex; flex-direction: column; gap: 20px; }
     .month-title { font-size: 0.95rem; color: var(--accent-blue); margin-bottom: 8px; text-transform: capitalize; }
     .month-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-    .year-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #111827; border-radius: 4px; font-size: 0.75rem; color: var(--text-dim); }
+    
+    .year-day { 
+      aspect-ratio: 1; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      background: #111827; 
+      border-radius: 4px; 
+      font-size: 0.75rem; 
+      color: var(--text-dim); 
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .year-day:active { transform: scale(0.9); }
     .year-day.taken { background: var(--accent-green) !important; color: #000 !important; font-weight: bold; }
     .year-day.today { border: 1px solid #fff; }
-    .year-day.empty { background: transparent; }
+    .year-day.empty { background: transparent; cursor: default; }
 
     /* MODAL POPUP DIA */
     .modal-overlay {
@@ -640,6 +653,9 @@
       </div>
 
       <h2>Seguimiento Anual</h2>
+      <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 14px;">
+        👉 Pulsa sobre cualquier día para marcarlo o desmarcarlo manualmente.
+      </p>
       <div class="year-grid" id="year-container"></div>
     </section>
   </div>
@@ -1268,8 +1284,22 @@
       const hoyISO = obtenerFechaHoyISO();
       if (!creatinaDias.includes(hoyISO)) {
         creatinaDias.push(hoyISO);
-        localStorage.setItem('creatina_dias', JSON.stringify(creatinaDias));
+      } else {
+        // Si se pulsa y ya estaba marcada, la desmarca
+        creatinaDias = creatinaDias.filter(d => d !== hoyISO);
       }
+      localStorage.setItem('creatina_dias', JSON.stringify(creatinaDias));
+      comprobarBotonCreatina();
+      generarCalendarioAnual();
+    }
+
+    function toggleDiaCreatinaManual(fechaISO) {
+      if (creatinaDias.includes(fechaISO)) {
+        creatinaDias = creatinaDias.filter(d => d !== fechaISO);
+      } else {
+        creatinaDias.push(fechaISO);
+      }
+      localStorage.setItem('creatina_dias', JSON.stringify(creatinaDias));
       comprobarBotonCreatina();
       generarCalendarioAnual();
     }
@@ -1278,11 +1308,17 @@
       const btn = document.getElementById('btn-main-creatina');
       const hoyISO = obtenerFechaHoyISO();
       if (creatinaDias.includes(hoyISO)) {
-        btn.disabled = true;
-        btn.innerText = '✓ Creatina tomada hoy 💊';
+        btn.disabled = false;
+        btn.innerText = '✓ Creatina tomada hoy (Pulsar para desmarcar) 💊';
+        btn.style.background = 'rgba(34, 197, 94, 0.2)';
+        btn.style.border = '1px solid var(--accent-green)';
+        btn.style.color = 'var(--accent-green)';
       } else {
         btn.disabled = false;
         btn.innerText = 'Me he tomado la creatina 💊';
+        btn.style.background = 'var(--accent-green)';
+        btn.style.border = 'none';
+        btn.style.color = '#000';
       }
     }
 
@@ -1294,7 +1330,7 @@
 
       let ano = anoSeleccionado ? parseInt(anoSeleccionado) : (selectAno ? parseInt(selectAno.value) : 2026);
 
-      // Si es 2026 empieza en septiembre (mes index 8), para los demás años empieza en enero (mes index 0)
+      // 2026 empieza en septiembre (mes 8), los demás años desde enero (mes 0)
       const mesInicio = (ano === 2026) ? 8 : 0;
 
       for (let mes = mesInicio; mes < 12; mes++) {
@@ -1325,6 +1361,9 @@
 
           if (creatinaDias.includes(fechaISO)) dayEl.classList.add('taken');
           if (fechaISO === obtenerFechaHoyISO()) dayEl.classList.add('today');
+
+          // Permite marcar/desmarcar con un toque directo
+          dayEl.onclick = () => toggleDiaCreatinaManual(fechaISO);
 
           daysGrid.appendChild(dayEl);
         }
