@@ -285,27 +285,26 @@
       border-radius: 8px;
       padding: 14px;
       margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .progress-title {
       font-size: 1rem;
       font-weight: bold;
-      color: var(--accent-blue);
-      margin-bottom: 8px;
-      border-bottom: 1px solid #1e293b;
-      padding-bottom: 4px;
+      color: var(--text);
     }
 
-    .progress-entry {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      padding: 4px 0;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px dashed #1e293b;
+    .progress-record-badge {
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      font-weight: 800;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid var(--accent-green);
+      padding: 6px 10px;
+      border-radius: 6px;
     }
-
-    .progress-entry:last-child { border-bottom: none; }
 
     .btn-clear-history {
       width: 100%;
@@ -461,7 +460,6 @@
     .year-day.today { border: 1px solid #fff; }
     .year-day.empty { background: transparent; cursor: default; }
 
-    /* MODAL POPUP DIA */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.75);
@@ -588,7 +586,7 @@
   <!-- PESTAÑA 3: PROGRESO -->
   <div id="tab-progreso" class="tab-content">
     <section class="card">
-      <h2>Historial de Registro</h2>
+      <h2>Récords Máximos (PB)</h2>
       <button class="btn-clear-history" onclick="confirmarBorradoProgreso()">⚠️ Borrar todo el historial</button>
       <div id="progreso-container"></div>
     </section>
@@ -697,14 +695,14 @@
 
   <script>
     const BASE_EJERCICIOS = {
-      Pecho: ["Press de Banca con Barra", "Press Inclinado con Barra", "Press Declinado con Barra", "Press de Banca con Mancuernas", "Press Inclinado con Mancuernas", "Press en Máquina Pecho", "Aperturas con Mancuernas", "Cruces de Polea Alta", "Cruces de Polea Baja", "Fondos en Paralelas (Pecho)", "Pec-Deck (Aperturas en Máquina)", "Flexiones (Push-ups)"],
-      Espalda: ["Jalón al Pecho", "Jalón Agarre Estrecho / Neutro", "Dominadas (Agarre Prono)", "Dominadas Supinas (Chin-ups)", "Remo con Barra", "Remo T con Apoyo", "Remo en Polea Baja / Gironda", "Remo Unilateral con Mancuerna", "Remo en Máquina", "Pullover en Polea Alta", "Rack Pulls", "Encogimientos de Trapecio con Barra/Mancuernas"],
+      Pecho: ["Jalón al pecho", "Press de Banca con Barra", "Press Inclinado con Barra", "Press Declinado con Barra", "Press de Banca con Mancuernas", "Press Inclinado con Mancuernas", "Press en Máquina Pecho", "Aperturas con Mancuernas", "Cruces de Polea Alta", "Cruces de Polea Baja", "Fondos en Paralelas (Pecho)", "Pec-Deck (Aperturas en Máquina)", "Flexiones (Push-ups)"],
+      Espalda: ["Remo en polea baja", "Dorsales en máquina", "Jalón al Pecho", "Jalón Agarre Estrecho / Neutro", "Dominadas (Agarre Prono)", "Dominadas Supinas (Chin-ups)", "Remo con Barra", "Remo T con Apoyo", "Remo en Polea Baja / Gironda", "Remo Unilateral con Mancuerna", "Remo en Máquina", "Pullover en Polea Alta", "Rack Pulls", "Encogimientos de Trapecio con Barra/Mancuernas"],
       Hombros: ["Press Militar con Barra", "Press de Hombros con Mancuernas", "Press Arnold", "Press en Máquina de Hombros", "Elevaciones Laterales con Mancuernas", "Elevaciones Laterales en Polea", "Pájaros con Mancuerna (Deltoides Posterior)", "Pájaros en Máquina Pec-Deck Inversa", "Facepull en Polea", "Elevaciones Frontales con Mancuerna/Disco", "Remo al Mentón"],
       Biceps: ["Curl de Bíceps con Barra recta/Z", "Curl Alterno con Mancuernas", "Curl Martillo con Mancuernas", "Curl en Banco Scott / Predicador", "Curl Concentrado", "Curl de Bíceps en Polea Baja", "Curl Bayesian en Polea", "Curl Inclinado con Mancuernas", "Curl Araña"],
-      Triceps: ["Press Francés con Barra Z", "Extensión de Tríceps en Polea Alta (Cuerda)", "Extensión de Tríceps en Polea (Barra)", "Extensión Tras Nuca con Mancuerna", "Extensión Tras Nuca en Polea", "Press de Banca Agarre Cerrado", "Fondos de Tríceps en Banco/Paralelas", "Patada de Tríceps con Polea/Mancuerna"],
-      Pierna: ["Sentadilla Trasera con Barra", "Sentadilla Frontal", "Sentadilla Hack / Jaca", "Sentadilla Pendular", "Prensa de Piernas Inclinada", "Extensión de Cuádriceps en Máquina", "Sentadilla Búlgara", "Zancadas con Mancuernas/Barra", "Sentadilla Goblet", "Peso Muerto Rumano con Barra"],
+      Triceps: ["Extensión de tríceps en máquina", "Press Francés con Barra Z", "Extensión de Tríceps en Polea Alta (Cuerda)", "Extensión de Tríceps en Polea (Barra)", "Extensión Tras Nuca con Mancuerna", "Extensión Tras Nuca en Polea", "Press de Banca Agarre Cerrado", "Fondos de Tríceps en Banco/Paralelas", "Patada de Tríceps con Polea/Mancuerna"],
+      Pierna: ["Curl en máquina sentado", "Sentadilla Trasera con Barra", "Sentadilla Frontal", "Sentadilla Hack / Jaca", "Sentadilla Pendular", "Prensa de Piernas Inclinada", "Extensión de Cuádriceps en Máquina", "Sentadilla Búlgara", "Zancadas con Mancuernas/Barra", "Sentadilla Goblet", "Peso Muerto Rumano con Barra"],
       Gemelos: ["Elevación de Talones De Pie en Máquina", "Elevación de Talones Sentado", "Elevación de Talones en Prensa", "Elevación de Talones en Multipower"],
-      Abdominales: ["Crunch Abdominal en Suelo", "Crunch en Polea Alta", "Elevación de Piernas Colgado", "Rueda Abdominal", "Plancha Isométrica", "Giros Rusos (Russian Twists)", "Press Pallof en Polea", "Frenos de Sierra (Deadbug)"]
+      Abdominales: ["Aplastamiento abdominal en máquina", "Crunch Abdominal en Suelo", "Crunch en Polea Alta", "Elevación de Piernas Colgado", "Rueda Abdominal", "Plancha Isométrica", "Giros Rusos (Russian Twists)", "Press Pallof en Polea", "Frenos de Sierra (Deadbug)"]
     };
 
     let rutinas = JSON.parse(localStorage.getItem('rutinas_gym')) || [];
@@ -948,9 +946,16 @@
         return;
       }
 
-      const diasEnRutina = [...new Set(rutinas.map(item => item.dia))];
+      // Mantener el orden exacto de los días según aparecen en el listado de rutinas
+      const diasEnRutina = [];
+      rutinas.forEach(item => {
+        if (!diasEnRutina.includes(item.dia)) {
+          diasEnRutina.push(item.dia);
+        }
+      });
 
       diasEnRutina.forEach(dia => {
+        // Mantiene exactamente el orden en el que fueron añadidos
         const ejerciciosDelDia = rutinas.filter(item => item.dia === dia);
 
         if (ejerciciosDelDia.length > 0) {
@@ -972,7 +977,7 @@
             card.className = 'exercise-card';
 
             let prevText = seriesData[key].previo 
-              ? `Registro previo: ${seriesData[key].previo.weight} kg × ${seriesData[key].previo.reps} (${seriesData[key].previo.fecha})`
+              ? `Último registro: ${seriesData[key].previo.weight} kg × ${seriesData[key].previo.reps} reps (${seriesData[key].previo.fecha})`
               : 'Sin registro previo';
 
             let setsHTML = '';
@@ -1043,42 +1048,53 @@
       const fechaStr = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
       const hoyISO = obtenerFechaHoyISO();
 
-      // 1. Guardar el progreso de las series completadas
+      // Guardar únicamente el máximo peso levantado en el día para el apartado progreso (Récord)
       ejercicios.forEach(item => {
         const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
         const sets = seriesData[key]?.sets || [];
 
-        sets.forEach((s, idx) => {
+        let maxPesoSet = null;
+
+        sets.forEach((s) => {
           if (s.done && s.weight && s.reps) {
-            seriesData[key].previo = { weight: s.weight, reps: s.reps, fecha: fechaStr };
-            if (!historialProgreso[item.ejercicio]) historialProgreso[item.ejercicio] = [];
-            historialProgreso[item.ejercicio].push({ fecha: fechaStr, serie: idx + 1, peso: s.weight, reps: s.reps });
+            const pesoNum = parseFloat(s.weight);
+            if (!maxPesoSet || pesoNum > parseFloat(maxPesoSet.weight)) {
+              maxPesoSet = { weight: s.weight, reps: s.reps };
+            }
           }
         });
+
+        if (maxPesoSet) {
+          seriesData[key].previo = { weight: maxPesoSet.weight, reps: maxPesoSet.reps, fecha: fechaStr };
+
+          // Actualizar solo si supera el récord histórico anterior o no existía
+          const recordActual = historialProgreso[item.ejercicio];
+          if (!recordActual || parseFloat(maxPesoSet.weight) >= parseFloat(recordActual.peso)) {
+            historialProgreso[item.ejercicio] = {
+              fecha: fechaStr,
+              peso: maxPesoSet.weight,
+              reps: maxPesoSet.reps
+            };
+          }
+        }
 
         if (seriesData[key]) seriesData[key].sets.forEach(s => s.done = false);
       });
 
-      // 2. Comprobar si el día es de la semana estándar o personalizado
       const esDiaEstandar = DIAS_SEMANA_DEFAULT.includes(dia);
 
       if (esDiaEstandar) {
         registroDiarioActividad[hoyISO] = 'entrenado';
       } else {
-        // Es un día personalizado: guardar como 'custom' en el calendario
         registroDiarioActividad[hoyISO] = 'custom';
-        
-        // Eliminar los ejercicios configurados bajo este nombre de día personalizado
         rutinas = rutinas.filter(item => item.dia !== dia);
         localStorage.setItem('rutinas_gym', JSON.stringify(rutinas));
       }
 
-      // 3. Actualizar almacenamiento local
       localStorage.setItem('series_gym_data', JSON.stringify(seriesData));
       localStorage.setItem('historial_progreso', JSON.stringify(historialProgreso));
       localStorage.setItem('registro_actividad_diario', JSON.stringify(registroDiarioActividad));
 
-      // 4. Re-renderizar la interfaz
       renderizarRutinas();
       renderizarPlanning();
       renderizarProgreso();
@@ -1091,37 +1107,34 @@
 
       const keys = Object.keys(historialProgreso);
       if (keys.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-dim); font-size: 0.9rem;">No tienes registros guardados aún.</p>';
+        container.innerHTML = '<p style="color: var(--text-dim); font-size: 0.9rem;">No tienes récords guardados aún.</p>';
         return;
       }
 
       keys.forEach(ejercicio => {
         const card = document.createElement('div');
         card.className = 'progress-card';
+        const record = historialProgreso[ejercicio];
 
-        let entriesHTML = '';
-        const registros = historialProgreso[ejercicio].slice().reverse();
-
-        registros.forEach(r => {
-          entriesHTML += `
-            <div class="progress-entry">
-              <span><strong>${r.fecha}</strong> (Serie ${r.serie})</span>
-              <span style="color: var(--accent-blue); font-weight: bold;">${r.peso} kg × ${r.reps} reps</span>
-            </div>
-          `;
-        });
-
-        card.innerHTML = `<div class="progress-title">${ejercicio}</div>${entriesHTML}`;
+        card.innerHTML = `
+          <div>
+            <div class="progress-title">${ejercicio}</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">Logrado el ${record.fecha}</div>
+          </div>
+          <div class="progress-record-badge">
+            ${record.peso} KG × ${record.reps} reps
+          </div>
+        `;
         container.appendChild(card);
       });
     }
 
     function confirmarBorradoProgreso() {
-      if (confirm("⚠️ ¿ESTÁS SEGURO?\n\nEsta acción borrará todo tu historial de pesos y repeticiones. No se podrá recuperar.")) {
+      if (confirm("⚠️ ¿ESTÁS SEGURO?\n\nEsta acción borrará todos tus récords personales. No se podrá recuperar.")) {
         historialProgreso = {};
         localStorage.removeItem('historial_progreso');
         renderizarProgreso();
-        alert("El historial de progreso ha sido borrado por completo.");
+        alert("El historial de récord ha sido borrado.");
       }
     }
 
