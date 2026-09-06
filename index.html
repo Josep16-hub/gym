@@ -700,7 +700,7 @@
       Hombros: ["Press Militar con Barra", "Press de Hombros con Mancuernas", "Press Arnold", "Press en Máquina de Hombros", "Elevaciones Laterales con Mancuernas", "Elevaciones Laterales en Polea", "Pájaros con Mancuerna (Deltoides Posterior)", "Pájaros en Máquina Pec-Deck Inversa", "Facepull en Polea", "Elevaciones Frontales con Mancuerna/Disco", "Remo al Mentón"],
       Biceps: ["Curl de Bíceps con Barra recta/Z", "Curl Alterno con Mancuernas", "Curl Martillo con Mancuernas", "Curl en Banco Scott / Predicador", "Curl Concentrado", "Curl de Bíceps en Polea Baja", "Curl Bayesian en Polea", "Curl Inclinado con Mancuernas", "Curl Araña"],
       Triceps: ["Extensión de tríceps en máquina", "Press Francés con Barra Z", "Extensión de Tríceps en Polea Alta (Cuerda)", "Extensión de Tríceps en Polea (Barra)", "Extensión Tras Nuca con Mancuerna", "Extensión Tras Nuca en Polea", "Press de Banca Agarre Cerrado", "Fondos de Tríceps en Banco/Paralelas", "Patada de Tríceps con Polea/Mancuerna"],
-      Pierna: ["Curl en máquina sentado", "Sentadilla Trasera con Barra", "Sentadilla Frontal", "Sentadilla Hack / Jaca", "Sentadilla Pendular", "Prensa de Piernas Inclinada", "Extensión de Cuádriceps en Máquina", "Sentadilla Búlgara", "Zancadas con Mancuernas/Barra", "Sentadilla Goblet", "Peso Muerto Rumano con Barra"],
+      Pierna: ["Abductores abiertos", "Abductores cerrados", "Curl en máquina sentado", "Sentadilla Trasera con Barra", "Sentadilla Frontal", "Sentadilla Hack / Jaca", "Sentadilla Pendular", "Prensa de Piernas Inclinada", "Extensión de Cuádriceps en Máquina", "Sentadilla Búlgara", "Zancadas con Mancuernas/Barra", "Sentadilla Goblet", "Peso Muerto Rumano con Barra"],
       Gemelos: ["Elevación de Talones De Pie en Máquina", "Elevación de Talones Sentado", "Elevación de Talones en Prensa", "Elevación de Talones en Multipower"],
       Abdominales: ["Aplastamiento abdominal en máquina", "Crunch Abdominal en Suelo", "Crunch en Polea Alta", "Elevación de Piernas Colgado", "Rueda Abdominal", "Plancha Isométrica", "Giros Rusos (Russian Twists)", "Press Pallof en Polea", "Frenos de Sierra (Deadbug)"]
     };
@@ -946,7 +946,6 @@
         return;
       }
 
-      // Mantener el orden exacto de los días según aparecen en el listado de rutinas
       const diasEnRutina = [];
       rutinas.forEach(item => {
         if (!diasEnRutina.includes(item.dia)) {
@@ -955,7 +954,6 @@
       });
 
       diasEnRutina.forEach(dia => {
-        // Mantiene exactamente el orden en el que fueron añadidos
         const ejerciciosDelDia = rutinas.filter(item => item.dia === dia);
 
         if (ejerciciosDelDia.length > 0) {
@@ -1048,7 +1046,6 @@
       const fechaStr = `${String(hoy.getDate()).padStart(2, '0')}/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
       const hoyISO = obtenerFechaHoyISO();
 
-      // Guardar únicamente el máximo peso levantado en el día para el apartado progreso (Récord)
       ejercicios.forEach(item => {
         const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
         const sets = seriesData[key]?.sets || [];
@@ -1067,7 +1064,6 @@
         if (maxPesoSet) {
           seriesData[key].previo = { weight: maxPesoSet.weight, reps: maxPesoSet.reps, fecha: fechaStr };
 
-          // Actualizar solo si supera el récord histórico anterior o no existía
           const recordActual = historialProgreso[item.ejercicio];
           if (!recordActual || parseFloat(maxPesoSet.weight) >= parseFloat(recordActual.peso)) {
             historialProgreso[item.ejercicio] = {
