@@ -115,13 +115,27 @@
     .btn-edit { background: var(--accent-blue); color: #000; }
     .btn-delete { background: var(--accent-red); }
 
-    .day-header-container {
-      margin: 20px 0 14px 4px;
-      border-left: 3px solid var(--accent-blue);
-      padding-left: 8px;
+    /* ESTILOS DE DÍAS DESPLEGABLES (ACORDEÓN) */
+    .day-accordion-btn {
+      width: 100%;
+      background: #0d1322;
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--accent-blue);
+      padding: 14px 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s ease;
     }
 
-    .day-title {
+    .day-accordion-btn:hover {
+      background: #111827;
+    }
+
+    .day-accordion-title {
       font-size: 1.1rem;
       font-weight: 800;
       color: var(--accent-blue);
@@ -129,12 +143,40 @@
       letter-spacing: 0.5px;
     }
 
+    .day-accordion-subtitle {
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: none;
+      margin-left: 6px;
+    }
+
+    .day-accordion-icon {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      transition: transform 0.3s ease;
+    }
+
+    .day-accordion-btn.active .day-accordion-icon {
+      transform: rotate(180deg);
+      color: var(--accent-blue);
+    }
+
+    .day-accordion-content {
+      display: none;
+      padding-top: 14px;
+    }
+
+    .day-accordion-content.active {
+      display: block;
+    }
+
     .exercise-card {
       background: #0d1322;
       border: 1px solid #1e293b;
       border-radius: 8px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .exercise-card-header {
@@ -271,7 +313,7 @@
       font-weight: 800;
       cursor: pointer;
       margin-top: 10px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
       display: flex;
       align-items: center;
@@ -484,21 +526,59 @@
     }
     .btn-modal-save { background: var(--accent-blue); color: #000; }
     .btn-modal-cancel { background: #334155; color: #fff; }
+    .btn-modal-danger { background: var(--accent-red); color: #fff; }
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
       background: var(--nav-bg); border-top: 1px solid var(--card-border);
-      display: flex; justify-around: align-items: center; z-index: 1000;
+      display: flex; justify-around: space-around; align-items: center; z-index: 1000;
     }
     .nav-item {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       background: none; border: none; color: var(--text-dim);
-      font-size: 0.6rem; font-weight: bold; cursor: pointer; width: 16%; padding: 8px 0;
+      font-size: 0.6rem; font-weight: bold; cursor: pointer; flex: 1; padding: 8px 0;
     }
     .nav-item.active { color: var(--accent-blue); }
     .nav-icon { font-size: 1.1rem; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    .info-version-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--accent-blue);
+      color: var(--accent-blue);
+      padding: 4px 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .info-footer-text {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    .btn-danger-full {
+      width: 100%;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s ease;
+    }
+    .btn-danger-full:hover {
+      background: var(--accent-red);
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -547,9 +627,7 @@
       </div>
 
       <div class="form-group">
-        <label>Selecciona los Ejercicios (puedes marcar varios)</label>
         <div id="ejercicios-grid" style="display: flex; flex-direction: column; gap: 8px;">
-          <p style="color: var(--text-dim); font-size: 0.85rem;">-- Selecciona una zona muscular primero --</p>
         </div>
       </div>
 
@@ -647,6 +725,37 @@
     </section>
   </div>
 
+  <!-- PESTAÑA 7: INFORMACIÓN / COPIA DE SEGURIDAD -->
+  <div id="tab-informacion" class="tab-content">
+    <section class="card" style="text-align: center;">
+      <h2>Información de la App</h2>
+      <div class="info-version-badge">Versión 1.05</div>
+
+      <div style="margin-top: 10px;">
+        <label style="margin-bottom: 10px; font-weight: bold; color: var(--text);">Copia de Seguridad</label>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="exportarDatos()" style="flex:1; padding: 10px; background: var(--accent-blue); color: #000; border: none; font-weight: bold; border-radius: 6px; cursor: pointer;">
+            💾 Guardar Archivo
+          </button>
+          <button onclick="document.getElementById('file-input').click()" style="flex:1; padding: 10px; background: #334155; color: #fff; border: none; font-weight: bold; border-radius: 6px; cursor: pointer;">
+            📂 Cargar Archivo
+          </button>
+          <input type="file" id="file-input" style="display: none;" onchange="importarDatos(event)" accept=".json">
+        </div>
+      </div>
+
+      <button class="btn-danger-full" onclick="abrirModalResetTotal()">
+        🗑️ Borrar todo
+      </button>
+
+      <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
+
+      <p class="info-footer-text">
+        Hecho con ❤️ por Gemini y compilado en GitHub
+      </p>
+    </section>
+  </div>
+
   <!-- MODAL SELECCION ESTADO CALENDARIO -->
   <div class="modal-overlay" id="modal-cal-overlay">
     <div class="modal-box">
@@ -661,6 +770,20 @@
       <div class="modal-actions">
         <button class="btn-modal btn-modal-cancel" onclick="cerrarModalCal()">Cancelar</button>
         <button class="btn-modal btn-modal-save" onclick="guardarModalCal()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMACION BORRADO TOTAL -->
+  <div class="modal-overlay" id="modal-reset-overlay">
+    <div class="modal-box" style="text-align: center;">
+      <h3 style="color: var(--accent-red); font-size: 1.2rem;">⚠️ ¿Estás seguro?</h3>
+      <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; line-height: 1.4;">
+        Esta acción eliminará <strong>toda la configuración</strong>: rutinas, historial de series, récords, calendario y datos de creatina. <br><br>No se podrá deshacer.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" onclick="cerrarModalResetTotal()">Cancelar</button>
+        <button class="btn-modal btn-modal-danger" onclick="ejecutarResetTotal()">Sí, borrar todo</button>
       </div>
     </div>
   </div>
@@ -691,6 +814,10 @@
       <span class="nav-icon">📖</span>
       <span>Ejercicios</span>
     </button>
+    <button class="nav-item" id="nav-informacion" onclick="cambiarTab('informacion')">
+      <span class="nav-icon">💾</span>
+      <span>Información</span>
+    </button>
   </nav>
 
   <script>
@@ -710,6 +837,7 @@
     let historialProgreso = JSON.parse(localStorage.getItem('historial_progreso')) || {}; 
     let creatinaDias = JSON.parse(localStorage.getItem('creatina_dias')) || [];
     let registroDiarioActividad = JSON.parse(localStorage.getItem('registro_actividad_diario')) || {};
+    let estadoAcordeonDias = JSON.parse(localStorage.getItem('estado_acordeon_dias')) || {};
 
     const fechaActual = new Date();
     let calAño = fechaActual.getFullYear();
@@ -729,6 +857,61 @@
       comprobarBotonCreatina();
       renderizarCalendarioActividad();
     };
+
+    function exportarDatos() {
+      const data = {
+        rutinas: JSON.parse(localStorage.getItem('rutinas_gym')) || [],
+        seriesData: JSON.parse(localStorage.getItem('series_gym_data')) || {},
+        historialProgreso: JSON.parse(localStorage.getItem('historial_progreso')) || {},
+        creatinaDias: JSON.parse(localStorage.getItem('creatina_dias')) || [],
+        registroActividad: JSON.parse(localStorage.getItem('registro_actividad_diario')) || {}
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `fittracker_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importarDatos(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.rutinas) localStorage.setItem('rutinas_gym', JSON.stringify(data.rutinas));
+          if (data.seriesData) localStorage.setItem('series_gym_data', JSON.stringify(data.seriesData));
+          if (data.historialProgreso) localStorage.setItem('historial_progreso', JSON.stringify(data.historialProgreso));
+          if (data.creatinaDias) localStorage.setItem('creatina_dias', JSON.stringify(data.creatinaDias));
+          if (data.registroActividad) localStorage.setItem('registro_actividad_diario', JSON.stringify(data.registroActividad));
+
+          alert("¡Datos restaurados con éxito!");
+          location.reload();
+        } catch (err) {
+          alert("Error al leer el archivo de copia de seguridad.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function abrirModalResetTotal() {
+      document.getElementById('modal-reset-overlay').classList.add('active');
+    }
+
+    function cerrarModalResetTotal() {
+      document.getElementById('modal-reset-overlay').classList.remove('active');
+    }
+
+    function ejecutarResetTotal() {
+      localStorage.clear();
+      cerrarModalResetTotal();
+      location.reload();
+    }
 
     function poblarSelectorAnosCreatina() {
       const selectAno = document.getElementById('select-creatina-ano');
@@ -758,7 +941,6 @@
 
       grid.innerHTML = '';
       if (zonasSeleccionadas.length === 0) {
-        grid.innerHTML = '<p style="color: var(--text-dim); font-size: 0.85rem;">-- Selecciona una zona primero --</p>';
         document.getElementById('group-ejercicio-manual').style.display = 'none';
         return;
       }
@@ -937,6 +1119,19 @@
       document.getElementById('reps').value = '8-10';
     }
 
+    function toggleDiaAcordeon(dia) {
+      estadoAcordeonDias[dia] = !estadoAcordeonDias[dia];
+      localStorage.setItem('estado_acordeon_dias', JSON.stringify(estadoAcordeonDias));
+
+      const btn = document.getElementById(`btn-acc-${dia}`);
+      const content = document.getElementById(`content-acc-${dia}`);
+
+      if (btn && content) {
+        btn.classList.toggle('active');
+        content.classList.toggle('active');
+      }
+    }
+
     function renderizarPlanning() {
       const container = document.getElementById('planning-container');
       container.innerHTML = '';
@@ -957,10 +1152,31 @@
         const ejerciciosDelDia = rutinas.filter(item => item.dia === dia);
 
         if (ejerciciosDelDia.length > 0) {
-          const dayHeader = document.createElement('div');
-          dayHeader.className = 'day-header-container';
-          dayHeader.innerHTML = `<div class="day-title">${dia}</div>`;
-          container.appendChild(dayHeader);
+          const isOpen = !!estadoAcordeonDias[dia];
+
+          const zonasSet = new Set();
+          ejerciciosDelDia.forEach(ex => {
+            if (ex.zonas && Array.isArray(ex.zonas)) {
+              ex.zonas.forEach(z => zonasSet.add(z));
+            }
+          });
+          const textoZonas = Array.from(zonasSet).join(', ');
+
+          const accordionBtn = document.createElement('button');
+          accordionBtn.className = `day-accordion-btn ${isOpen ? 'active' : ''}`;
+          accordionBtn.id = `btn-acc-${dia}`;
+          accordionBtn.onclick = () => toggleDiaAcordeon(dia);
+          accordionBtn.innerHTML = `
+            <span class="day-accordion-title">
+              ${dia}${textoZonas ? ` <span class="day-accordion-subtitle">(${textoZonas})</span>` : ''}
+            </span>
+            <span class="day-accordion-icon">▼</span>
+          `;
+          container.appendChild(accordionBtn);
+
+          const accordionContent = document.createElement('div');
+          accordionContent.className = `day-accordion-content ${isOpen ? 'active' : ''}`;
+          accordionContent.id = `content-acc-${dia}`;
 
           ejerciciosDelDia.forEach((item, exIdx) => {
             const key = `${item.dia}_${item.ejercicio}`.replace(/\s+/g, '_');
@@ -1013,14 +1229,16 @@
               <div class="prev-record">${prevText}</div>
               <div class="sets-list">${setsHTML}</div>
             `;
-            container.appendChild(card);
+            accordionContent.appendChild(card);
           });
 
           const finishBtn = document.createElement('button');
           finishBtn.className = 'btn-finish-day';
           finishBtn.innerHTML = `🏋️‍♂️ ¡Ya he terminado! 💪`;
           finishBtn.onclick = () => finalizarDia(dia, ejerciciosDelDia);
-          container.appendChild(finishBtn);
+          accordionContent.appendChild(finishBtn);
+
+          container.appendChild(accordionContent);
         }
       });
     }
