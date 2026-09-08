@@ -450,32 +450,6 @@
     .activity-day-cell.enfermo { background: rgba(239, 68, 68, 0.2); border-color: var(--accent-red); color: var(--accent-red); }
     .activity-day-cell.today { border: 2px solid #fff; }
 
-    .ex-guide-card {
-      background: #0d1322;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .btn-demo {
-      background: var(--accent-blue);
-      color: #000;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
     .btn-take-creatina {
       width: 100%; padding: 16px; font-size: 1.1rem; font-weight: bold;
       border-radius: 10px; border: none; background: var(--accent-green); color: #000; cursor: pointer;
@@ -540,8 +514,8 @@
     .nav-item {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
       background: none; border: none; color: var(--text-dim);
-      font-size: 0.6rem; font-weight: bold; cursor: pointer; padding: 8px 12px;
-      flex: 0 0 auto; min-width: 68px;
+      font-size: 0.65rem; font-weight: bold; cursor: pointer; padding: 8px 12px;
+      flex: 1; min-width: 60px;
     }
     .nav-item.active { color: var(--accent-blue); }
     .nav-icon { font-size: 1.1rem; }
@@ -722,19 +696,11 @@
     </section>
   </div>
 
-  <!-- PESTAÑA 6: CATÁLOGO DE EJERCICIOS -->
-  <div id="tab-ejercicios" class="tab-content">
-    <section class="card">
-      <h2>Catálogo de Ejercicios</h2>
-      <div id="catalogo-container"></div>
-    </section>
-  </div>
-
-  <!-- PESTAÑA 7: INFORMACIÓN / COPIA DE SEGURIDAD -->
+  <!-- PESTAÑA 6: INFORMACIÓN / COPIA DE SEGURIDAD -->
   <div id="tab-informacion" class="tab-content">
     <section class="card" style="text-align: center;">
       <h2>Información de la App</h2>
-      <div class="info-version-badge">Versión 1.05</div>
+      <div class="info-version-badge">Versión 1.06</div>
 
       <div style="margin-top: 10px;">
         <label style="margin-bottom: 10px; font-weight: bold; color: var(--text);">Copia de Seguridad</label>
@@ -815,13 +781,9 @@
       <span class="nav-icon">💊</span>
       <span>Creatina</span>
     </button>
-    <button class="nav-item" id="nav-ejercicios" onclick="cambiarTab('ejercicios')">
-      <span class="nav-icon">📖</span>
-      <span>Ejercicios</span>
-    </button>
     <button class="nav-item" id="nav-informacion" onclick="cambiarTab('informacion')">
       <span class="nav-icon">💾</span>
-      <span>Información</span>
+      <span>Info</span>
     </button>
   </nav>
 
@@ -856,7 +818,6 @@
       renderizarRutinas();
       renderizarPlanning();
       renderizarProgreso();
-      renderizarCatalogo();
       poblarSelectorAnosCreatina();
       generarCalendarioAnual();
       comprobarBotonCreatina();
@@ -991,7 +952,6 @@
       if (tab === 'progreso') renderizarProgreso();
       if (tab === 'actividad') renderizarCalendarioActividad();
       if (tab === 'creatina') generarCalendarioAnual();
-      if (tab === 'ejercicios') renderizarCatalogo();
     }
 
     function guardarEjercicio() {
@@ -1452,32 +1412,6 @@
       }
 
       container.appendChild(grid);
-    }
-
-    function renderizarCatalogo() {
-      const container = document.getElementById('catalogo-container');
-      container.innerHTML = '';
-
-      Object.keys(BASE_EJERCICIOS).forEach(grupo => {
-        const groupTitle = document.createElement('h3');
-        groupTitle.style.margin = '16px 0 8px 0';
-        groupTitle.style.color = 'var(--accent-blue)';
-        groupTitle.style.fontSize = '1.05rem';
-        groupTitle.innerText = grupo;
-        container.appendChild(groupTitle);
-
-        BASE_EJERCICIOS[grupo].forEach(ex => {
-          const card = document.createElement('div');
-          card.className = 'ex-guide-card';
-          const searchUrl = `https://www.youtube.com/results?search_query=como+hacer+${encodeURIComponent(ex)}`;
-
-          card.innerHTML = `
-            <div class="ex-guide-info"><strong>${ex}</strong></div>
-            <a href="${searchUrl}" target="_blank" class="btn-demo">🎥 Ver cómo se hace</a>
-          `;
-          container.appendChild(card);
-        });
-      });
     }
 
     function obtenerFechaHoyISO() {
