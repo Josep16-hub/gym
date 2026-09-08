@@ -502,23 +502,82 @@
     .btn-modal-cancel { background: #334155; color: #fff; }
     .btn-modal-danger { background: var(--accent-red); color: #fff; }
 
-    /* NAVEGACIÓN CORREGIDA PARA MÓVILES */
+    /* NAVEGACIÓN INFERIOR MEJORADA Y CENTRADA */
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
-      background: var(--nav-bg); border-top: 1px solid var(--card-border);
-      display: flex; align-items: center; z-index: 1000;
-      overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;
-      -ms-overflow-style: none; scrollbar-width: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: #090d16;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: stretch;
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
     .bottom-nav::-webkit-scrollbar { display: none; }
+
     .nav-item {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-      background: none; border: none; color: var(--text-dim);
-      font-size: 0.65rem; font-weight: bold; cursor: pointer; padding: 8px 12px;
-      flex: 1; min-width: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 4px;
+      flex: 1;
+      min-width: 62px;
+      transition: all 0.2s ease;
+      position: relative;
     }
-    .nav-item.active { color: var(--accent-blue); }
-    .nav-icon { font-size: 1.1rem; }
+    .nav-item:last-child {
+      border-right: none;
+    }
+
+    .nav-item:active {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .nav-item.active {
+      color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 3px;
+      background: var(--accent-blue);
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 2px 8px var(--accent-blue);
+    }
+
+    .nav-icon {
+      font-size: 1.15rem;
+      transition: transform 0.2s ease;
+    }
+
+    .nav-item.active .nav-icon {
+      transform: translateY(-1px) scale(1.1);
+    }
+
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -700,7 +759,7 @@
   <div id="tab-informacion" class="tab-content">
     <section class="card" style="text-align: center;">
       <h2>Información de la App</h2>
-      <div class="info-version-badge">Versión 1.06</div>
+      <div class="info-version-badge">Versión 1.07</div>
 
       <div style="margin-top: 10px;">
         <label style="margin-bottom: 10px; font-weight: bold; color: var(--text);">Copia de Seguridad</label>
@@ -759,7 +818,7 @@
     </div>
   </div>
 
-  <!-- NAVEGACIÓN INFERIOR -->
+  <!-- NAVEGACIÓN INFERIOR REDISEÑADA -->
   <nav class="bottom-nav">
     <button class="nav-item active" id="nav-rutina" onclick="cambiarTab('rutina')">
       <span class="nav-icon">🏋️</span>
@@ -775,15 +834,15 @@
     </button>
     <button class="nav-item" id="nav-actividad" onclick="cambiarTab('actividad')">
       <span class="nav-icon">🗓️</span>
-      <span>Calendario</span>
+      <span>Agenda</span>
     </button>
     <button class="nav-item" id="nav-creatina" onclick="cambiarTab('creatina')">
       <span class="nav-icon">💊</span>
       <span>Creatina</span>
     </button>
     <button class="nav-item" id="nav-informacion" onclick="cambiarTab('informacion')">
-      <span class="nav-icon">💾</span>
-      <span>Info</span>
+      <span class="nav-icon">⚙️</span>
+      <span>Ajustes</span>
     </button>
   </nav>
 
@@ -946,7 +1005,10 @@
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
       document.getElementById(`tab-${tab}`).classList.add('active');
-      document.getElementById(`nav-${tab}`).classList.add('active');
+      
+      const navBtn = document.getElementById(`nav-${tab}`);
+      navBtn.classList.add('active');
+      navBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
       if (tab === 'planning') renderizarPlanning();
       if (tab === 'progreso') renderizarProgreso();
